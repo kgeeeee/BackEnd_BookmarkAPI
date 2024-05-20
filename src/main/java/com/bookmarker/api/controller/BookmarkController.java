@@ -2,6 +2,7 @@ package com.bookmarker.api.controller;
 
 import com.bookmarker.api.domain.Bookmark;
 import com.bookmarker.api.domain.BookmarkRepository;
+import com.bookmarker.api.dto.BookmarksDTO;
 import com.bookmarker.api.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,10 +26,8 @@ public class BookmarkController {
     private final BookmarkRepository repository;
 
     @Transactional(readOnly = true)
-    public List<Bookmark> getBookmarks(Integer page) {
-        int pageNo = page < 1 ? 0 : page - 1;
-        Pageable pageable = PageRequest.of(pageNo, 5, Sort.Direction.DESC, "id");
-        return repository.findAll(pageable).getContent();
+    public BookmarksDTO getBookmarks(Integer page) {
+        return bookmarkService.getBookmarks(page);
     }
 
 }
