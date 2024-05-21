@@ -2,17 +2,18 @@ package com.bookmarker.api.controller;
 
 import com.bookmarker.api.domain.Bookmark;
 import com.bookmarker.api.domain.BookmarkRepository;
+import com.bookmarker.api.dto.BookmarkDTO;
 import com.bookmarker.api.dto.BookmarksDTO;
+import com.bookmarker.api.dto.CreateBookmarkRequest;
 import com.bookmarker.api.service.BookmarkService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,11 +24,21 @@ public class BookmarkController {
 
     private final BookmarkService bookmarkService;
 
-    private final BookmarkRepository repository;
+    @GetMapping
+    public BookmarksDTO getBookmarks(
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "query", defaultValue = "") String query) {
 
-    @Transactional(readOnly = true)
-    public BookmarksDTO getBookmarks(Integer page) {
-        return bookmarkService.getBookmarks(page);
+        if(query == null || query.isBlank()) {
+            return bookmarkService.getBookmarks(page);
+        }
+        return bookmarkService.searchBookmarks(query, page);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookmarkDTO createBookmark(@RequestBody @Valid CreateBookmarkRequest request) {
+        return bookmarkService.createBookmark(request);
     }
 
 }
